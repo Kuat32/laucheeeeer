@@ -207,6 +207,7 @@ public class PlayerActivity extends Activity {
             @Override
             public void onPlaybackStateChanged(int state) {
                 if (state == Player.STATE_READY) {
+                    Log.i(TAG, "playing ok");
                     ui.removeCallbacks(loadTimeout);
                     autoSkips = 0;
                     statusView.setVisibility(View.GONE);
@@ -223,6 +224,7 @@ public class PlayerActivity extends Activity {
 
             @Override
             public void onPlayerError(PlaybackException error) {
+                Log.i(TAG, "player error: " + error.getErrorCodeName() + " " + error.getMessage());
                 onChannelFailed();
             }
         });
@@ -268,6 +270,7 @@ public class PlayerActivity extends Activity {
         String playingUrl = current >= 0 && current < channels.size() ? channels.get(current).url : null;
         channels = list;
         adapter.notifyDataSetChanged();
+        Log.i(TAG, "channels loaded: " + list.size() + " start=" + startPlayback);
 
         if (playingUrl != null) {
             // Обновили список в фоне: остаёмся на том же канале, номер мог сдвинуться.
@@ -295,6 +298,7 @@ public class PlayerActivity extends Activity {
         if (player == null) createPlayer();
         current = index;
         Playlist.Channel ch = channels.get(index);
+        Log.i(TAG, "play #" + ch.number + " " + ch.name + " " + ch.url);
         getSharedPreferences(PREFS, MODE_PRIVATE).edit().putString(KEY_LAST_URL, ch.url).apply();
         showInfo();
         showStatus("Загрузка…", 0);
@@ -333,6 +337,7 @@ public class PlayerActivity extends Activity {
 
     private void onChannelFailed() {
         ui.removeCallbacks(loadTimeout);
+        Log.i(TAG, "channel failed, skips=" + autoSkips);
         if (current < 0 || current >= channels.size()) return;
         Playlist.markBroken(this, channels.get(current));
         if (player != null) player.stop();
@@ -379,7 +384,7 @@ public class PlayerActivity extends Activity {
     public boolean dispatchKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            Log.d(TAG, "key " + KeyEvent.keyCodeToString(keyCode) + " repeat=" + event.getRepeatCount()
+            Log.i(TAG, "key " + KeyEvent.keyCodeToString(keyCode) + " repeat=" + event.getRepeatCount()
                     + " channels=" + channels.size() + " current=" + current
                     + " list=" + (listView.getVisibility() == View.VISIBLE));
         }
