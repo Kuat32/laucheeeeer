@@ -462,7 +462,9 @@ public class MainActivity extends Activity {
             public void onFocusChange(View v, boolean hasFocus) {
                 float s = hasFocus ? 1.08f : 1f;
                 v.animate().scaleX(s).scaleY(s).setDuration(110).start();
-                if (hasFocus) v.bringToFront();
+                // Рисуем выбранную плитку поверх соседей через Z, а не bringToFront():
+                // bringToFront() в LinearLayout переставляет плитку в конец ряда.
+                v.setTranslationZ(hasFocus ? dp(8) : 0);
             }
         });
         return tile;
