@@ -4,6 +4,7 @@
     <string name="favorites">Избранное</string>
     <string name="all_apps">Все приложения</string>
     <string name="tv">Телевизор</string>
+    <string name="find_movies">Найти кино (ищет во всех приложениях)</string>
     <string name="hint">Долгое нажатие OK или кнопка ☰ — добавить/убрать из избранного · PROG +/− или цифры — сразу включить «Телевизор»</string>
 
     <color name="background">#FF101114</color>

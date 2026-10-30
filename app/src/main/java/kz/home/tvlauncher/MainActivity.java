@@ -1,6 +1,7 @@
 package kz.home.tvlauncher;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -62,6 +63,15 @@ public class MainActivity extends Activity {
             "com.google.android.youtube.tvkids",
     };
 
+    /** Подборки для поиска: название плитки, запрос, цвет. */
+    private static final String[][] SEARCHES = {
+            {"Русские мелодрамы", "русские мелодрамы", "#FF9D2B5A"},
+            {"Советские фильмы", "советские фильмы", "#FF8A5A2B"},
+            {"Комедии", "русские комедии", "#FF2E7D5B"},
+            {"Сериалы", "русские сериалы", "#FF3C4F9E"},
+            {"Мультфильмы", "мультфильмы", "#FF7A3E9D"},
+    };
+
     private static final int[] TILE_COLORS = {
             0xFF2B5D8A, 0xFF7A3E9D, 0xFF2E7D5B, 0xFFA2522A,
             0xFF8A2B4A, 0xFF3C4F9E, 0xFF5E6B2B, 0xFF2A6F7A,
@@ -72,6 +82,7 @@ public class MainActivity extends Activity {
 
     private ScrollView scroll;
     private LinearLayout favoritesRow;
+    private LinearLayout searchRow;
     private LinearLayout allAppsGrid;
     private TextView clockView;
     private TextView dateView;
@@ -121,6 +132,7 @@ public class MainActivity extends Activity {
 
         scroll = (ScrollView) findViewById(R.id.scroll);
         favoritesRow = (LinearLayout) findViewById(R.id.favorites_row);
+        searchRow = (LinearLayout) findViewById(R.id.search_row);
         allAppsGrid = (LinearLayout) findViewById(R.id.all_apps_grid);
         clockView = (TextView) findViewById(R.id.clock);
         dateView = (TextView) findViewById(R.id.date);
@@ -329,6 +341,8 @@ public class MainActivity extends Activity {
 
     private void render() {
         favoritesRow.removeAllViews();
+        searchRow.removeAllViews();
+        for (String[] q : SEARCHES) searchRow.addView(searchTile(q[0], q[1], android.graphics.Color.parseColor(q[2])));
         allAppsGrid.removeAllViews();
 
         favoritesRow.addView(tvTile());
@@ -412,6 +426,48 @@ public class MainActivity extends Activity {
             }
         });
         return tile;
+    }
+
+    private View searchTile(String title, final String query, int color) {
+        FrameLayout tile = baseTile("search:" + query, color);
+        Drawable icon = getResources().getDrawable(android.R.drawable.ic_menu_search);
+        addIconAndLabel(tile, icon, title);
+        tile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchEverywhere(query);
+            }
+        });
+        return tile;
+    }
+
+    /**
+     * Поиск Google TV ищет сразу во всех установленных приложениях (ivi, Кинопоиск, TV+, YouTube…).
+     * Если его нет, ищем в YouTube, а если нет и YouTube — в Google Play.
+     */
+    private void searchEverywhere(String query) {
+        Intent[] attempts = {
+                new Intent("android.search.action.GLOBAL_SEARCH")
+                        .putExtra(SearchManager.QUERY, query),
+                new Intent(Intent.ACTION_SEARCH)
+                        .setPackage("com.google.android.katniss")
+                        .putExtra(SearchManager.QUERY, query),
+                new Intent(Intent.ACTION_SEARCH)
+                        .setPackage("com.google.android.youtube.tv")
+                        .putExtra(SearchManager.QUERY, query),
+                new Intent(Intent.ACTION_VIEW, android.net.Uri.parse(
+                        "https://www.youtube.com/results?search_query=" + android.net.Uri.encode(query))),
+        };
+        for (Intent intent : attempts) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            try {
+                if (intent.resolveActivity(getPackageManager()) == null) continue;
+                startActivity(intent);
+                return;
+            } catch (RuntimeException ignored) {
+            }
+        }
+        Toast.makeText(this, "Поиск недоступен на этом телевизоре", Toast.LENGTH_SHORT).show();
     }
 
     private View settingsTile() {
