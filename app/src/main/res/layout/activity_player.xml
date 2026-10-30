@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FF000000">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:shutter_background_color="#FF000000"
+        app:use_controller="false" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="#B3000000"
+        android:gravity="center"
+        android:padding="20dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="30sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/info_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="#CC101114"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="48dp"
+        android:paddingTop="20dp"
+        android:paddingRight="48dp"
+        android:paddingBottom="24dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/info_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFF2A33A"
+            android:textSize="48sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="28dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/info_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="#FFFFFFFF"
+                android:textSize="36sp" />
+
+            <TextView
+                android:id="@+id/info_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FF9AA0A8"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="▲▼ — переключить\nOK — все каналы"
+            android:textColor="#FF9AA0A8"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/number_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right"
+        android:layout_margin="40dp"
+        android:background="#CC101114"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:textColor="#FFF2A33A"
+        android:textSize="72sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/channel_list"
+        android:layout_width="560dp"
+        android:layout_height="match_parent"
+        android:background="#EE101114"
+        android:divider="@null"
+        android:listSelector="@color/list_selected"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        android:scrollbars="none"
+        android:visibility="gone" />
+</FrameLayout>

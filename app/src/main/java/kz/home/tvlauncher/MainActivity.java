@@ -309,6 +309,7 @@ public class MainActivity extends Activity {
         favoritesRow.removeAllViews();
         allAppsGrid.removeAllViews();
 
+        favoritesRow.addView(tvTile());
         for (String pkg : readFavorites()) {
             AppEntry e = apps.get(pkg);
             if (e != null) favoritesRow.addView(appTile(e, true));
@@ -372,6 +373,19 @@ public class MainActivity extends Activity {
                 if (favorite && keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN) return moveFavorite(e.packageName, -1);
                 if (favorite && keyCode == KeyEvent.KEYCODE_CHANNEL_UP) return moveFavorite(e.packageName, 1);
                 return false;
+            }
+        });
+        return tile;
+    }
+
+    /** Первая плитка: встроенный телевизор с бесплатными каналами. */
+    private View tvTile() {
+        FrameLayout tile = baseTile("tv", getResources().getColor(R.color.tv_tile));
+        addIconAndLabel(tile, getResources().getDrawable(R.drawable.ic_tv), getString(R.string.tv));
+        tile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, PlayerActivity.class));
             }
         });
         return tile;

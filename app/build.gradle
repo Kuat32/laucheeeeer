@@ -10,8 +10,8 @@ android {
         applicationId "kz.home.tvlauncher"
         minSdk 21
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
 
     // Постоянный ключ подписи: благодаря ему новые версии ставятся поверх старой
@@ -43,4 +43,12 @@ android {
         abortOnError false
         checkReleaseBuilds false
     }
+}
+
+dependencies {
+    // Плеер для IPTV: умеет HLS (.m3u8), на котором вещает почти всё.
+    def media3 = '1.4.1'
+    implementation "androidx.media3:media3-exoplayer:$media3"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3"
+    implementation "androidx.media3:media3-ui:$media3"
 }

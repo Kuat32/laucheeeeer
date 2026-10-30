@@ -3,11 +3,14 @@
     <string name="app_name">Мой лаунчер</string>
     <string name="favorites">Избранное</string>
     <string name="all_apps">Все приложения</string>
+    <string name="tv">Телевизор</string>
     <string name="hint">Долгое нажатие OK или кнопка ☰ — добавить/убрать из избранного · P+ / P− — передвинуть плитку в избранном</string>
 
     <color name="background">#FF101114</color>
     <color name="text">#FFF2F2F2</color>
     <color name="text_dim">#FF9AA0A8</color>
+    <color name="list_selected">#FF2B5D8A</color>
+    <color name="tv_tile">#FFC2410C</color>
 
     <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
         <item name="android:windowBackground">@color/background</item>
