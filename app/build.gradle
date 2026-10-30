@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'kz.home.tvlauncher'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "kz.home.tvlauncher"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    // Постоянный ключ подписи: благодаря ему новые версии ставятся поверх старой
+    // без удаления (и без потери избранного). Не теряйте launcher.keystore.
+    signingConfigs {
+        release {
+            storeFile file('launcher.keystore')
+            storePassword 'tvlauncher'
+            keyAlias 'launcher'
+            keyPassword 'tvlauncher'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}

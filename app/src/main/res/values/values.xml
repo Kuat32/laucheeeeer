@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Мой лаунчер</string>
+    <string name="favorites">Избранное</string>
+    <string name="all_apps">Все приложения</string>
+    <string name="hint">Долгое нажатие OK или кнопка ☰ — добавить/убрать из избранного · P+ / P− — передвинуть плитку в избранном</string>
+
+    <color name="background">#FF101114</color>
+    <color name="text">#FFF2F2F2</color>
+    <color name="text_dim">#FF9AA0A8</color>
+
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorAccent">#FFFFFFFF</item>
+    </style>
+
+    <style name="SectionTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">22dp</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:textColor">@color/text_dim</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>
