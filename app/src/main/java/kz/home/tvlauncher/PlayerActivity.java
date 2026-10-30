@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -44,6 +45,7 @@ import java.util.concurrent.Executors;
  */
 public class PlayerActivity extends Activity {
 
+    private static final String TAG = "TvPlayer";
     private static final String PREFS = "player";
     private static final String KEY_LAST_URL = "last_url";
     private static final String DEFAULT_UA =
@@ -345,6 +347,52 @@ public class PlayerActivity extends Activity {
 
     // ---------------------------------------------------------------- пульт
 
+    /**
+     * Ловим кнопки раньше всех элементов экрана: иначе часть пультов (Sony RM-ED…)
+     * присылает их так, что до onKeyDown они не доходят.
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int keyCode = event.getKeyCode();
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            Log.d(TAG, "key " + KeyEvent.keyCodeToString(keyCode) + " repeat=" + event.getRepeatCount()
+                    + " channels=" + channels.size() + " current=" + current
+                    + " list=" + (listView.getVisibility() == View.VISIBLE));
+        }
+        if (listView.getVisibility() != View.VISIBLE && isOurKey(keyCode)) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN) handleKey(keyCode);
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
+    private static boolean isOurKey(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_DPAD_UP:
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+            case KeyEvent.KEYCODE_ENTER:
+            case KeyEvent.KEYCODE_NUMPAD_ENTER:
+            case KeyEvent.KEYCODE_CHANNEL_UP:
+            case KeyEvent.KEYCODE_CHANNEL_DOWN:
+            case KeyEvent.KEYCODE_PAGE_UP:
+            case KeyEvent.KEYCODE_PAGE_DOWN:
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
+            case KeyEvent.KEYCODE_MEDIA_REWIND:
+            case KeyEvent.KEYCODE_GUIDE:
+            case KeyEvent.KEYCODE_MENU:
+            case KeyEvent.KEYCODE_INFO:
+                return true;
+            default:
+                return (keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9)
+                        || (keyCode >= KeyEvent.KEYCODE_NUMPAD_0 && keyCode <= KeyEvent.KEYCODE_NUMPAD_9);
+        }
+    }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (listView.getVisibility() == View.VISIBLE) {
@@ -354,13 +402,30 @@ public class PlayerActivity extends Activity {
             }
             return super.onKeyDown(keyCode, event);
         }
+        return handleKey(keyCode) || super.onKeyDown(keyCode, event);
+    }
+
+    private boolean handleKey(int keyCode) {
+        if (keyCode >= KeyEvent.KEYCODE_NUMPAD_0 && keyCode <= KeyEvent.KEYCODE_NUMPAD_9) {
+            keyCode = KeyEvent.KEYCODE_0 + (keyCode - KeyEvent.KEYCODE_NUMPAD_0);
+        }
+        if (channels.isEmpty() && keyCode != KeyEvent.KEYCODE_BACK) {
+            showStatus("Список каналов ещё загружается…", 2500);
+            return true;
+        }
         switch (keyCode) {
             case KeyEvent.KEYCODE_DPAD_UP:
             case KeyEvent.KEYCODE_CHANNEL_UP:
+            case KeyEvent.KEYCODE_PAGE_UP:
+            case KeyEvent.KEYCODE_MEDIA_NEXT:
+            case KeyEvent.KEYCODE_MEDIA_FAST_FORWARD:
                 zap(1);
                 return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
             case KeyEvent.KEYCODE_CHANNEL_DOWN:
+            case KeyEvent.KEYCODE_PAGE_DOWN:
+            case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+            case KeyEvent.KEYCODE_MEDIA_REWIND:
                 zap(-1);
                 return true;
             case KeyEvent.KEYCODE_DPAD_CENTER:
@@ -386,7 +451,7 @@ public class PlayerActivity extends Activity {
             ui.postDelayed(commitNumber, 1800);
             return true;
         }
-        return super.onKeyDown(keyCode, event);
+        return false;
     }
 
     @Override
