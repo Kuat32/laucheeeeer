@@ -163,6 +163,28 @@ public class MainActivity extends Activity {
         focusFirstTile();
     }
 
+    /**
+     * На главном экране PROG +/− и цифры сразу включают «Телевизор»:
+     * пожилым не нужно искать плитку, достаточно нажать привычную кнопку.
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int code = event.getKeyCode();
+        boolean channelKey = code == KeyEvent.KEYCODE_CHANNEL_UP || code == KeyEvent.KEYCODE_CHANNEL_DOWN;
+        int digit = -1;
+        if (code >= KeyEvent.KEYCODE_0 && code <= KeyEvent.KEYCODE_9) digit = code - KeyEvent.KEYCODE_0;
+        if (code >= KeyEvent.KEYCODE_NUMPAD_0 && code <= KeyEvent.KEYCODE_NUMPAD_9) digit = code - KeyEvent.KEYCODE_NUMPAD_0;
+        if (channelKey || digit >= 0) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+                Intent tv = new Intent(this, PlayerActivity.class);
+                if (digit >= 0) tv.putExtra(PlayerActivity.EXTRA_DIGIT, digit);
+                startActivity(tv);
+            }
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+
     /** Кнопка «Назад» на главном экране ничего не делает. */
     @Override
     public void onBackPressed() {
@@ -361,7 +383,8 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-        // Кнопка «Меню» (☰) на пульте — то же самое; в избранном каналы ◀ ▶ с кнопками P+/P- двигают плитку.
+        // Кнопка «Меню» (☰) на пульте — то же самое; в избранном перемотка ◀◀ ▶▶ двигает плитку.
+        // PROG +/− здесь не трогаем: они включают «Телевизор» (см. dispatchKeyEvent).
         tile.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -370,8 +393,8 @@ public class MainActivity extends Activity {
                     toggleFavorite(e);
                     return true;
                 }
-                if (favorite && keyCode == KeyEvent.KEYCODE_CHANNEL_DOWN) return moveFavorite(e.packageName, -1);
-                if (favorite && keyCode == KeyEvent.KEYCODE_CHANNEL_UP) return moveFavorite(e.packageName, 1);
+                if (favorite && keyCode == KeyEvent.KEYCODE_MEDIA_REWIND) return moveFavorite(e.packageName, -1);
+                if (favorite && keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD) return moveFavorite(e.packageName, 1);
                 return false;
             }
         });

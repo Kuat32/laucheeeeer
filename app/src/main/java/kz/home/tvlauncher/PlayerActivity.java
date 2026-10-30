@@ -46,6 +46,8 @@ import java.util.concurrent.Executors;
 public class PlayerActivity extends Activity {
 
     private static final String TAG = "TvPlayer";
+    /** Цифра, нажатая на главном экране: начинаем с неё набор номера канала. */
+    static final String EXTRA_DIGIT = "digit";
     private static final String PREFS = "player";
     private static final String KEY_LAST_URL = "last_url";
     private static final String DEFAULT_UA =
@@ -83,8 +85,16 @@ public class PlayerActivity extends Activity {
     private final Runnable commitNumber = new Runnable() {
         @Override
         public void run() {
+            if (typed.length() == 0) {
+                numberView.setVisibility(View.GONE);
+                return;
+            }
+            if (channels.isEmpty()) {
+                // Список ещё грузится — подождём его, номер не теряем.
+                ui.postDelayed(this, 500);
+                return;
+            }
             numberView.setVisibility(View.GONE);
-            if (typed.length() == 0) return;
             int n;
             try {
                 n = Integer.parseInt(typed.toString());
@@ -150,6 +160,20 @@ public class PlayerActivity extends Activity {
         });
 
         loadChannels();
+        takeDigit(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        takeDigit(intent);
+    }
+
+    private void takeDigit(android.content.Intent intent) {
+        int digit = intent != null ? intent.getIntExtra(EXTRA_DIGIT, -1) : -1;
+        if (digit < 0) return;
+        intent.removeExtra(EXTRA_DIGIT);
+        handleKey(KeyEvent.KEYCODE_0 + digit);
     }
 
     @Override
@@ -409,7 +433,8 @@ public class PlayerActivity extends Activity {
         if (keyCode >= KeyEvent.KEYCODE_NUMPAD_0 && keyCode <= KeyEvent.KEYCODE_NUMPAD_9) {
             keyCode = KeyEvent.KEYCODE_0 + (keyCode - KeyEvent.KEYCODE_NUMPAD_0);
         }
-        if (channels.isEmpty() && keyCode != KeyEvent.KEYCODE_BACK) {
+        boolean digitKey = keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9;
+        if (channels.isEmpty() && !digitKey) {
             showStatus("Список каналов ещё загружается…", 2500);
             return true;
         }
